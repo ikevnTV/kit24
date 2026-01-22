@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+
+<h2>Iniciar Sesión</h2>
+
+<input id="email" placeholder="Correo"><br>
+<input id="password" type="password" placeholder="Contraseña"><br>
+
+<button id="btnLogin">Entrar</button>
+
+<script type="module">
+import { auth } from "./js/firebase.js";
+import { signInWithEmailAndPassword } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+btnLogin.addEventListener("click", async () => {
+  await signInWithEmailAndPassword(auth, email.value, password.value);
+  location.href = "index.html";
+});
+</script>
+
+</body>
+</html>
