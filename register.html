@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registro</title>
+</head>
+<body>
+
+<h2>Registro</h2>
+
+<input id="nombre" placeholder="Nombre"><br>
+<input id="email" placeholder="Correo"><br>
+<input id="password" type="password" placeholder="Contraseña"><br>
+
+<button id="btnRegistro">Registrarse</button>
+
+<script type="module">
+import { auth, db } from "./js/firebase.js";
+import { createUserWithEmailAndPassword } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { doc, setDoc } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+btnRegistro.addEventListener("click", async () => {
+  const user = await createUserWithEmailAndPassword(
+    auth,
+    email.value,
+    password.value
+  );
+
+  await setDoc(doc(db, "usuarios", user.user.uid), {
+    nombre: nombre.value
+  });
+
+  alert("Registro exitoso");
+  location.href = "index.html";
+});
+</script>
+
+</body>
+</html>
