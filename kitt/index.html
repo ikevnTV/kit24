@@ -1,34 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mi página</title>
+</head>
+<body>
+
+<h1>Bienvenido</h1>
+
+<!-- SECCIÓN LOGIN / REGISTRO -->
+<div id="auth">
+  <p>No has iniciado sesión</p>
+  <a href="login.html">Iniciar sesión</a><br>
+  <a href="register.html">Registrarse</a>
+</div>
+
+<!-- SECCIÓN COMENTARIOS -->
+<div id="comentarios" style="display:none;">
+  <h2>Comentarios</h2>
+
+  <textarea id="comentario"></textarea><br>
+  <button id="btnComentar">Publicar</button>
+
+  <div id="lista"></div>
+
+  <br>
+  <button id="btnLogout">Cerrar sesión</button>
+</div>
+
 <script type="module">
 import { auth, db } from "./js/firebase.js";
-import { onAuthStateChanged } from 
+import { onAuthStateChanged, signOut } from 
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { addDoc, collection, serverTimestamp } from 
+import { addDoc, collection, getDocs, serverTimestamp } from 
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+const authDiv = document.getElementById("auth");
+const comentariosDiv = document.getElementById("comentarios");
+
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    location.href = "login.html";
+  if (user) {
+    // Usuario logueado
+    authDiv.style.display = "none";
+    comentariosDiv.style.display = "block";
+    cargarComentarios();
+  } else {
+    // Usuario NO logueado
+    authDiv.style.display = "block";
+    comentariosDiv.style.display = "none";
   }
 });
 
 btnComentar.addEventListener("click", async () => {
-  if (comentario.value.trim() === "") {
-    alert("Escribe algo");
-    return;
-  }
+  if (comentario.value.trim() === "") return;
 
-  try {
-    await addDoc(collection(db, "comentarios"), {
-      texto: comentario.value,
-      uid: auth.currentUser.uid,
-      fecha: serverTimestamp()
-    });
+  await addDoc(collection(db, "comentarios"), {
+    texto: comentario.value,
+    uid: auth.currentUser.uid,
+    fecha: serverTimestamp()
+  });
 
-    comentario.value = "";
-    alert("Comentario guardado ✅");
-  } catch (e) {
-    console.error(e);
-    alert("ERROR al guardar comentario");
-  }
+  comentario.value = "";
+  cargarComentarios();
+});
+
+async function cargarComentarios() {
+  lista.innerHTML = "";
+  const datos = await getDocs(collection(db, "comentarios"));
+  datos.forEach(doc => {
+    lista.innerHTML += `<p>${doc.data().texto}</p>`;
+  });
+}
+
+btnLogout.addEventListener("click", async () => {
+  await signOut(auth);
 });
 </script>
+
+</body>
+</html>
